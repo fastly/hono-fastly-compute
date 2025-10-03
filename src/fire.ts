@@ -1,10 +1,10 @@
 import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
-import type { BuildBindings, EnvBindingsDefs } from '@h7/fastly-compute-js-context';
+import type { ContextProxy, BindingsDefs } from '@fastly/compute-js-context';
 
 import { handle, type HandleOptions } from './handler.js';
 
-type FireFn<D extends EnvBindingsDefs> = {
+type FireFn<D extends BindingsDefs> = {
   /**
    * Registers a Hono app to handle fetch events in Fastly Compute.
    *
@@ -26,7 +26,7 @@ type FireFn<D extends EnvBindingsDefs> = {
    * fire(app);
    */
   <V extends { Variables?: object }, S extends Schema, BasePath extends string>(
-    app: HonoBase<(keyof D extends never ? {} : { Bindings: BuildBindings<D> }) & V, S, BasePath>,
+    app: HonoBase<(keyof D extends never ? {} : { Bindings: ContextProxy<D> }) & V, S, BasePath>,
     options?: HandleOptions
   ): void;
 
@@ -34,7 +34,7 @@ type FireFn<D extends EnvBindingsDefs> = {
    * The inferred bindings type, derived from the defs passed to `buildFire()`.
    * Use this in your Env definition: `{ Bindings: typeof fire.Bindings }`.
    */
-  Bindings: BuildBindings<D>;
+  Bindings: ContextProxy<D>;
 
   /** For debugging: the raw defs object you passed to buildFire */
   defs: D;
@@ -68,28 +68,28 @@ type FireFn<D extends EnvBindingsDefs> = {
  * fire(app);
  * ```
  *
- * @param envBindingsDefs - A mapping of binding names to binding types
+ * @param bindingsDefs - A mapping of binding names to binding types
  *                          (e.g. `{ foo: "KVStore", bar: "ConfigStore" }`).
  * @returns A `fire` function that:
  *  - Registers your Hono app to handle fetch events
  *  - Exposes a `.Bindings` type inferred from the given defs
  */
-export function buildFire<D extends EnvBindingsDefs>(envBindingsDefs: D) {
+export function buildFire<D extends BindingsDefs>(bindingsDefs: D) {
 
   const fireFn = (<
     V extends { Variables?: object },
     S extends Schema,
     BasePath extends string
   >(
-    app: HonoBase<(keyof D extends never ? {} : { Bindings: BuildBindings<D> }) & V, S, BasePath>,
+    app: HonoBase<(keyof D extends never ? {} : { Bindings: ContextProxy<D> }) & V, S, BasePath>,
     options: HandleOptions = {
       fetch: undefined,
     },
   ) => {
-    addEventListener('fetch', handle(app, envBindingsDefs, options))
+    addEventListener('fetch', handle(app, bindingsDefs, options))
   }) as FireFn<D>;
 
-  fireFn.defs = envBindingsDefs;
+  fireFn.defs = bindingsDefs;
 
   return fireFn;
 

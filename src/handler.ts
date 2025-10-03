@@ -1,11 +1,11 @@
 import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
 import {
-  type EnvBindingsDefs,
+  type BindingsDefs,
   createContext,
-  buildEnvironment,
-  BuildBindings,
-} from '@h7/fastly-compute-js-context';
+  buildContextProxy,
+  type ContextProxy,
+} from '@fastly/compute-js-context';
 
 type Handler = (evt: FetchEvent) => void;
 export type HandleOptions = {
@@ -13,15 +13,15 @@ export type HandleOptions = {
 };
 
 // D may be empty, in which case Bindings is not required
-export type MaybeBindings<D extends EnvBindingsDefs> = keyof D extends never
+export type MaybeBindings<D extends BindingsDefs> = keyof D extends never
   ? {}
-  : { Bindings: BuildBindings<D> };
+  : { Bindings: ContextProxy<D> };
 
 /**
  * Adapter for Fastly Compute
  */
 export const handle = <
-  D extends EnvBindingsDefs,
+  D extends BindingsDefs,
   V extends { Variables?: object },
   S extends Schema,
   BasePath extends string
@@ -37,7 +37,7 @@ export const handle = <
     evt.respondWith(
       (async () => {
         const context = createContext();
-        const env = buildEnvironment(context, envBindingsDefs);
+        const env = buildContextProxy(context, envBindingsDefs);
         const res = await app.fetch(evt.request, env, {
           waitUntil: evt.waitUntil.bind(evt),
           passThroughOnException() {

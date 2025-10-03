@@ -1,15 +1,15 @@
 {
-  "name": "@h7/hono-fastly-compute",
-  "version": "0.1.0",
-  "description": "Utilities for using Fastly Compute with Hono",
+  "name": "@fastly/hono-fastly-compute",
+  "version": "0.2.0",
+  "description": "Helper utilities for using Hono with Fastly Compute",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/harmony7/hono-fastly-compute.git"
+    "url": "git+https://github.com/fastly/hono-fastly-compute.git"
   },
   "author": {
     "name": "Katsuyuki Omuro",
-    "email": "harmony7@pex2.jp"
+    "email": "komuro@fastly.com"
   },
   "type": "module",
   "main": "./build/index.js",
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@fastly/js-compute": "^3.0.0",
-    "@h7/fastly-compute-js-context": "^0.2.0"
+    "@fastly/compute-js-context": "^0.4.0"
   },
   "devDependencies": {
     "hono": "^4.9.5",
@@ -43,7 +43,8 @@
     "build/**/*.d.ts",
     "LICENSE",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "SECURITY.md"
   ],
   "keywords": [
     "hono",

@@ -6,6 +6,6 @@ export * from './utils.js';
 export type {
   ResourceType,
   Context,
-  EnvBindingsDefs,
-  BuildBindings,
-} from '@h7/fastly-compute-js-context';
+  ContextProxy,
+  BindingsDefs,
+} from '@fastly/compute-js-context';
