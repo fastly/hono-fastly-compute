@@ -1,0 +1,10 @@
+# Node dependencies
+node_modules/
+
+# Build/test artifacts
+build/
+coverage/
+
+# IDE files
+.idea/
+*.iml
