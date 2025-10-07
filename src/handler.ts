@@ -12,27 +12,40 @@ export type HandleOptions = {
   fetch?: typeof fetch,
 };
 
-// D may be empty, in which case Bindings is not required
-export type MaybeBindings<D extends BindingsDefs> = keyof D extends never
-  ? {}
-  : { Bindings: ContextProxy<D> };
+type HandleFn = {
+  // if no bindings, allow Bindings to not exist in Env
+  <
+    D extends BindingsDefs,
+    V extends { Variables?: object },
+    S extends Schema,
+    BasePath extends string
+  >(
+    app: HonoBase<(keyof D extends never ? {} : never) & V, S, BasePath>,
+    envBindingsDefs: D,
+    opts?: HandleOptions): Handler;
+  // always allow Env with proper Bindings
+  <
+    D extends BindingsDefs,
+    V extends { Variables?: object },
+    S extends Schema,
+    BasePath extends string
+  >(
+    app: HonoBase<{Bindings:ContextProxy<D>} & V, S, BasePath>,
+    envBindingsDefs: D,
+    opts?: HandleOptions): Handler;
+};
 
 /**
  * Adapter for Fastly Compute
  */
-export const handle = <
-  D extends BindingsDefs,
-  V extends { Variables?: object },
-  S extends Schema,
-  BasePath extends string
->(
-  app: HonoBase<MaybeBindings<D> & V, S, BasePath>,
-  envBindingsDefs: D,
+export const handle: HandleFn = (
+  app: any,
+  envBindingsDefs: any,
   opts: HandleOptions = {
     // To use `fetch` on a Service Worker correctly, bind it to `globalThis`.
     fetch: globalThis.fetch.bind(globalThis),
   }
-): Handler => {
+) => {
   return (evt) => {
     evt.respondWith(
       (async () => {

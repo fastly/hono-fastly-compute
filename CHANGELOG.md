@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Fixed
+
+- Fix typings when bindings are empty
+
 ## [0.3.0] - 2025-10-06
 
 ### Changed
