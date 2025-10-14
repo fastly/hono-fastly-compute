@@ -26,7 +26,7 @@
     "clean": "rm -rf build"
   },
   "dependencies": {
-    "@fastly/compute-js-context": "^0.4.2",
+    "@fastly/compute-js-context": "^0.5.1",
     "@fastly/js-compute": "^3.0.0"
   },
   "devDependencies": {

@@ -95,6 +95,27 @@ The core adapter function that connects Hono to the Fastly Compute `FetchEvent`.
 - **`bindingsDefs`**: The environment bindings definition.
 - **`options`**: An optional object with a `fetch` property.
 
+### `clientInfo` and `serverInfo`
+
+`clientInfo` ([ClientInfo](https://github.com/fastly/js-compute-runtime/blob/f9d6a121f13efbb586d6af210dedec61661dfc6d/types/globals.d.ts#L419-L436)) and `serverInfo` ([ServerInfo](https://github.com/fastly/js-compute-runtime/blob/f9d6a121f13efbb586d6af210dedec61661dfc6d/types/globals.d.ts#L438-L446)) are defined on `fire.Bindings` and available on `c.env`, even if the bindings definitions are empty:
+
+```typescript
+import { Hono } from 'hono';
+import { buildFire } from '@fastly/hono-fastly-compute';
+
+const fire = buildFire({});
+const app = new Hono<{Bindings: typeof fire.Bindings}>();
+
+app.get('/', (c) => {
+  const clientInfo = c.env.clientInfo;
+  const serverInfo = c.env.serverInfo;
+
+  c.text(`${clientInfo.address} ${serverInfo.address}`);
+});
+
+fire(app);
+```
+
 ### `logFastlyServiceVersion()`
 
 A Hono middleware that logs to the console the string `FASTLY_SERVICE_VERSION` followed by the value of the environment variable **FASTLY_SERVICE_VERSION**.

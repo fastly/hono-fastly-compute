@@ -1,8 +1,8 @@
 import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
-import type { ContextProxy, BindingsDefs } from '@fastly/compute-js-context';
+import type { BindingsDefs, ContextProxy } from '@fastly/compute-js-context';
 
-import { handle, type HandleOptions } from './handler.js';
+import { handle, type BindingsWithClientInfo, type HandleOptions } from './handler.js';
 
 /**
  * Registers a Hono app to handle fetch events in Fastly Compute.
@@ -46,7 +46,7 @@ type FireFn<D extends BindingsDefs> = {
    * The inferred bindings type, derived from the defs passed to `buildFire()`.
    * Use this in your Env definition: `{ Bindings: typeof fire.Bindings }`.
    */
-  Bindings: ContextProxy<D>;
+  Bindings: BindingsWithClientInfo<D>;
 
   /** For debugging: the raw defs object you passed to buildFire */
   defs: D;

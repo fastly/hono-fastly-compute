@@ -2,10 +2,14 @@ import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
 import {
   type BindingsDefs,
-  createContext,
-  buildContextProxy,
+  buildContextProxyOn,
   type ContextProxy,
 } from '@fastly/compute-js-context';
+
+export type BindingsWithClientInfo<D extends BindingsDefs> = ContextProxy<D> & {
+  clientInfo: ClientInfo,
+  serverInfo: ServerInfo,
+};
 
 type Handler = (evt: FetchEvent) => void;
 export type HandleOptions = {
@@ -13,24 +17,13 @@ export type HandleOptions = {
 };
 
 type HandleFn = {
-  // if no bindings, allow Bindings to not exist in Env
   <
     D extends BindingsDefs,
     V extends { Variables?: object },
     S extends Schema,
     BasePath extends string
   >(
-    app: HonoBase<(keyof D extends never ? {} : never) & V, S, BasePath>,
-    envBindingsDefs: D,
-    opts?: HandleOptions): Handler;
-  // always allow Env with proper Bindings
-  <
-    D extends BindingsDefs,
-    V extends { Variables?: object },
-    S extends Schema,
-    BasePath extends string
-  >(
-    app: HonoBase<{Bindings:ContextProxy<D>} & V, S, BasePath>,
+    app: HonoBase<{Bindings:BindingsWithClientInfo<D>} & V, S, BasePath>,
     envBindingsDefs: D,
     opts?: HandleOptions): Handler;
 };
@@ -49,8 +42,11 @@ export const handle: HandleFn = (
   return (evt) => {
     evt.respondWith(
       (async () => {
-        const context = createContext();
-        const env = buildContextProxy(context, envBindingsDefs);
+        const envBase = {
+          clientInfo: evt.client,
+          serverInfo: evt.server,
+        };
+        const env = buildContextProxyOn(envBase, envBindingsDefs);
         const res = await app.fetch(evt.request, env, {
           waitUntil: evt.waitUntil.bind(evt),
           passThroughOnException() {
