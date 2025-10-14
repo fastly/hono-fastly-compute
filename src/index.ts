@@ -1,3 +1,8 @@
+/*
+ * Copyright Fastly, Inc.
+ * Licensed under the MIT license. See LICENSE file for details.
+ */
+
 export * from './fire.js';
 export * from './handler.js';
 export * from './utils.js';

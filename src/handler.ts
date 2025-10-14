@@ -1,3 +1,8 @@
+/*
+ * Copyright Fastly, Inc.
+ * Licensed under the MIT license. See LICENSE file for details.
+ */
+
 import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
 import {

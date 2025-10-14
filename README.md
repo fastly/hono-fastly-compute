@@ -38,7 +38,6 @@ const fire = buildFire({
 type Env = {
   Bindings: typeof fire.Bindings;
 };
-
 const app = new Hono<Env>();
 
 app.get('/', async (c) => {

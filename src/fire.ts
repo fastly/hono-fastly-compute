@@ -1,3 +1,8 @@
+/*
+ * Copyright Fastly, Inc.
+ * Licensed under the MIT license. See LICENSE file for details.
+ */
+
 import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
 import type { BindingsDefs, ContextProxy } from '@fastly/compute-js-context';
@@ -64,8 +69,8 @@ type FireFn<D extends BindingsDefs> = {
  * const fire = buildFire({ grip: "ConfigStore", foo: "KVStore" });
  *
  * type Env = {
- *   Variables: Variables;
- *   Bindings: typeof fire.Bindings; // infer binding types automatically
+ *   Variables: Variables,
+ *   Bindings: typeof fire.Bindings, // infer binding types automatically
  * };
  *
  * const app = new Hono<Env>();
