@@ -120,6 +120,25 @@ fire(app);
 
 A Hono middleware that logs to the console the string `FASTLY_SERVICE_VERSION` followed by the value of the environment variable **FASTLY_SERVICE_VERSION**.
 
+### `getConnInfo()`
+
+An implementation of the [ConnInfo helper](https://hono.dev/docs/helpers/conninfo) for Fastly Compute.
+
+```typescript
+import { Hono } from 'hono';
+import { buildFire, getConnInfo } from '@fastly/hono-fastly-compute';
+
+const fire = buildFire({});
+const app = new Hono();
+
+app.get('/', (c) => {
+  const info = getConnInfo(c); // info is `ConnInfo`
+  return c.text(`Your remote address is ${info.remote.address}`);
+});
+
+fire(app);
+```
+
 ## Issues
 
 If you encounter any non-security-related bug or unexpected behavior, please [file an issue][bug] using the bug report template.
