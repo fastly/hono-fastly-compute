@@ -89,6 +89,7 @@ type FireFn<D extends BindingsDefs> = {
  *                          (e.g. `{ foo: "KVStore", bar: "ConfigStore" }`).
  * @returns A `fire` function that:
  *  - Registers your Hono app to handle fetch events
+ *  - Applies `bindingsDefs` to `c.env`
  *  - Exposes a `.Bindings` type inferred from the given defs
  */
 export function buildFire<D extends BindingsDefs>(bindingsDefs: D) {

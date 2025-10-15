@@ -35,10 +35,7 @@ const fire = buildFire({
 });
 
 // Use the inferred Bindings type in your Hono environment
-type Env = {
-  Bindings: typeof fire.Bindings;
-};
-const app = new Hono<Env>();
+const app = new Hono<{ Bindings: typeof fire.Bindings }>();
 
 app.get('/', async (c) => {
   // Access your bindings from the context
@@ -114,7 +111,7 @@ The core adapter function that connects Hono to the Fastly Compute `FetchEvent`.
 
 ### `clientInfo` and `serverInfo`
 
-`clientInfo` ([ClientInfo](https://github.com/fastly/js-compute-runtime/blob/f9d6a121f13efbb586d6af210dedec61661dfc6d/types/globals.d.ts#L419-L436)) and `serverInfo` ([ServerInfo](https://github.com/fastly/js-compute-runtime/blob/f9d6a121f13efbb586d6af210dedec61661dfc6d/types/globals.d.ts#L438-L446)) are defined on `fire.Bindings` and available on `c.env`, even if the bindings definitions are empty:
+`clientInfo` ([ClientInfo](https://github.com/fastly/js-compute-runtime/blob/f9d6a121f13efbb586d6af210dedec61661dfc6d/types/globals.d.ts#L419-L436)) and `serverInfo` ([ServerInfo](https://github.com/fastly/js-compute-runtime/blob/f9d6a121f13efbb586d6af210dedec61661dfc6d/types/globals.d.ts#L438-L446)) are always defined on `fire.Bindings` and can be made available on `c.env`, even if the bindings definitions are empty:
 
 ```typescript
 import { Hono } from 'hono';
