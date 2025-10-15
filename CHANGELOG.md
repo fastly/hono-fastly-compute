@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [0.3.3] - 2025-10-15
+
 ### Changed
 
 - Change debugging definition field to `_defs`
@@ -40,7 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release
 
-[unreleased]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.2...HEAD
+[unreleased]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.3...HEAD
+[0.3.3]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/fastly/hono-fastly-compute/compare/v0.1.0...v0.3.0

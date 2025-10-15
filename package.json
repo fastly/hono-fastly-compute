@@ -1,6 +1,6 @@
 {
   "name": "@fastly/hono-fastly-compute",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Helper utilities for using Hono with Fastly Compute",
   "license": "MIT",
   "repository": {
