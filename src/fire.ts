@@ -54,7 +54,7 @@ type FireFn<D extends BindingsDefs> = {
   Bindings: BindingsWithClientInfo<D>;
 
   /** For debugging: the raw defs object you passed to buildFire */
-  defs: D;
+  _defs: D;
 };
 
 /**
@@ -96,7 +96,7 @@ export function buildFire<D extends BindingsDefs>(bindingsDefs: D) {
   const fireFn = ((app: any, options: any = { fetch: undefined, } ) => {
     addEventListener('fetch', handle(app, bindingsDefs, options))
   }) as FireFn<D>;
-  fireFn.defs = bindingsDefs;
+  fireFn._defs = bindingsDefs;
 
   return fireFn;
 }

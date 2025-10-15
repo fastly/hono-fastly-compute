@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Changed
+
+- Change debugging definition field to `_defs`
+
 ## [0.3.2] - 2025-10-14
 
 ### Added
