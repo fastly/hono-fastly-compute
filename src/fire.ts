@@ -100,3 +100,18 @@ export function buildFire<D extends BindingsDefs>(bindingsDefs: D) {
 
   return fireFn;
 }
+
+/**
+ * Registers your Hono app to handle fetch events. No user-defined bindings are
+ * applied to `c.env`.
+ * `fire.Bindings` is a type you can use when defining your `Env`,
+ * providing access to platform-defined bindings such as `clientInfo` and
+ * `serverInfo`.
+ */
+export const fire = buildFire({});
+
+/**
+ * Default bindings which can be used when no user-defined bindings are present.
+ * Alias of `fire.Bindings`.
+ */
+export type Bindings = typeof fire.Bindings;

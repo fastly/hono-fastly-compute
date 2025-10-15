@@ -50,15 +50,33 @@ app.get('/', async (c) => {
 fire(app);
 ```
 
+### Example with no user resources
+
+An application that defines no user resources is even simpler:
+
+```typescript
+import { Hono } from 'hono';
+import { fire, type Bindings } from '@fastly/hono-fastly-compute';
+
+const app = new Hono<{ Bindings: Bindings }>();
+
+app.get('/', async (c) => {
+  // `clientInfo` and `serverInfo` are always available on `c.env`.
+  const clientInfo = c.env.clientInfo;
+  c.text(`Accessed from ${clientInfo.address}`);
+});
+
+fire(app);
+```
+
 ### Using the `logFastlyServiceVersion` Middleware
 
 This package includes a simple middleware to log the `FASTLY_SERVICE_VERSION` for debugging purposes.
 
 ```typescript
 import { Hono } from 'hono';
-import { buildFire, logFastlyServiceVersion } from '@fastly/hono-fastly-compute';
+import { fire, logFastlyServiceVersion } from '@fastly/hono-fastly-compute';
 
-const fire = buildFire({});
 const app = new Hono();
 
 // Use the middleware
@@ -100,10 +118,9 @@ The core adapter function that connects Hono to the Fastly Compute `FetchEvent`.
 
 ```typescript
 import { Hono } from 'hono';
-import { buildFire } from '@fastly/hono-fastly-compute';
+import { fire, type Bindings } from '@fastly/hono-fastly-compute';
 
-const fire = buildFire({});
-const app = new Hono<{Bindings: typeof fire.Bindings}>();
+const app = new Hono<{ Bindings: Bindings }>();
 
 app.get('/', (c) => {
   const clientInfo = c.env.clientInfo;
@@ -125,9 +142,8 @@ An implementation of the [ConnInfo helper](https://hono.dev/docs/helpers/conninf
 
 ```typescript
 import { Hono } from 'hono';
-import { buildFire, getConnInfo } from '@fastly/hono-fastly-compute';
+import { fire, getConnInfo } from '@fastly/hono-fastly-compute';
 
-const fire = buildFire({});
 const app = new Hono();
 
 app.get('/', (c) => {
