@@ -15,3 +15,10 @@ export type {
   ContextProxy,
   BindingsDefs,
 } from '@fastly/compute-js-context';
+
+declare module 'hono/types' {
+  interface FetchEventLike {
+    readonly client: ClientInfo;
+    readonly server: ServerInfo;
+  }
+}

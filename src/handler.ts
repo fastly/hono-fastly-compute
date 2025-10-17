@@ -52,13 +52,13 @@ export const handle: HandleFn = (
           serverInfo: evt.server,
         };
         const env = buildContextProxyOn(envBase, envBindingsDefs);
-        const res = await app.fetch(evt.request, env, {
-          waitUntil: evt.waitUntil.bind(evt),
+        const executionCtx = Object.assign(evt, {
           passThroughOnException() {
             throw new Error('Not implemented');
           },
-          props: undefined,
+          props: {},
         });
+        const res = await app.fetch(evt.request, env, executionCtx);
         if (opts.fetch && res.status === 404) {
           return await opts.fetch(evt.request);
         }
