@@ -101,9 +101,18 @@ The returned `fire` function has two purposes:
 1. When called with a Hono app instance (`fire(app)`), it registers the app to handle fetch events.
 2. It exposes a `Bindings` type (`typeof fire.Bindings`) that you can use to define your Hono `Env`.
 
+### `fire(app, options)`
+
+Registers your Hono app to handle fetch events. No user-defined bindings are
+applied to `c.env`. Equivalent to the return value of `buildFire({})`.
+
+### Type `Bindings`
+
+Default bindings which can be used when no user-defined bindings are present. Alias of `fire.Bindings`.
+
 ### `handle(app, bindingsDefs, options)`
 
-The core adapter function that connects Hono to the Fastly Compute `FetchEvent`. The `buildFire` function is a higher-level utility that uses `handle` internally.
+The core adapter function that connects Hono to the Fastly Compute `FetchEvent`. The `fire` function is a higher-level utility that uses `handle` internally.
 
 - **`app`**: The Hono application instance.
 - **`bindingsDefs`**: The environment bindings definition.
