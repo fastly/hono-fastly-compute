@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Fixed
+
+- Fixed incorrect type on FireFn overload
+
 ## [0.3.4] - 2025-10-17
 
 ### Added

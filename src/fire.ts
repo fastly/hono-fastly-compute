@@ -43,7 +43,7 @@ type FireFn<D extends BindingsDefs> = {
     S extends Schema,
     BasePath extends string,
   >(
-    app: HonoBase<{Bindings:ContextProxy<D>} & V, S, BasePath>,
+    app: HonoBase<{Bindings:BindingsWithClientInfo<D>} & V, S, BasePath>,
     options?: HandleOptions
   ): void;
 
