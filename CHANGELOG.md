@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [0.3.6] - 2025-10-19
+
 ### Added
 
 - Within `fire()`, run a dummy `match()` against the router, forcing it to build any caches during the pre-wizer step.
@@ -58,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release
 
-[unreleased]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.5...HEAD
+[unreleased]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.6...HEAD
+[0.3.6]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.2...v0.3.3
