@@ -95,7 +95,10 @@ type FireFn<D extends BindingsDefs> = {
 export function buildFire<D extends BindingsDefs>(bindingsDefs: D) {
 
   const fireFn = ((app: any, options: any = { fetch: undefined, } ) => {
-    addEventListener('fetch', handle(app, bindingsDefs, options))
+    // Run a dummy match() against the router.
+    // This forces the router (for example, RegExpRouter) to build any caches in the pre-wizer step.
+    app.router.match('', '');
+    addEventListener('fetch', handle(app, bindingsDefs, options));
   }) as FireFn<D>;
   fireFn._defs = bindingsDefs;
 

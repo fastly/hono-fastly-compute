@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Added
+
+- Within `fire()`, run a dummy `match()` against the router, forcing it to build any caches during the pre-wizer step.
+
 ## [0.3.5] - 2025-10-19
 
 ### Fixed
