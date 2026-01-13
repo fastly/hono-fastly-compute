@@ -16,11 +16,13 @@ jobs:
     needs: process-version
     uses: fastly/devex-reusable-workflows/.github/workflows/publish-javascript-npmjs-v1.yml@main
     with:
-      version: ${{ needs.process-version.outputs.version }}
+      expected_pkg_name: "@fastly/hono-fastly-compute"
+      expected_pkg_version: ${{ needs.process-version.outputs.version }}
       dist_tag: ${{ needs.process-version.outputs.dist_tag }}
   publish_github:
     needs: process-version
     uses: fastly/devex-reusable-workflows/.github/workflows/publish-javascript-github-v1.yml@main
     with:
-      version: ${{ needs.process-version.outputs.version }}
+      expected_pkg_name: "@fastly/hono-fastly-compute"
+      expected_pkg_version: ${{ needs.process-version.outputs.version }}
       dist_tag: ${{ needs.process-version.outputs.dist_tag }}
