@@ -21,9 +21,10 @@
   },
   "types": "./build/index.d.ts",
   "scripts": {
-    "prepack": "npm run build",
+    "prepack": "npm run clean:build && npm run build",
     "build": "tsc -p tsconfig.build.json",
-    "clean": "rm -rf build test/integration/.work",
+    "clean": "npm run clean:build && rm -rf test/integration/.work",
+    "clean:build": "rm -rf build",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p test/tsconfig.json",
     "test": "npm run typecheck && npm run test:unit",
     "test:unit": "node --import ./test/unit/hooks.ts --test \"test/unit/**/*.test.ts\"",

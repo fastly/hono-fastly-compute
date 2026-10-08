@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - README example used a Config Store name that isn't valid in the JS SDK (`my-config` → `my_config`)
 - `handle()` now accepts an app that declares no `Bindings` when the bindings definitions are empty (e.g. `handle(new Hono(), {})`), as `fire()` does. Previously this was a type error.
+- Clean `build/` before packing, so that stale files in `build/` can't be included in the package
 
 ### Added
 
