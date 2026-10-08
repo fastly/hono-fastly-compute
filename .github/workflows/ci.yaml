@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  # Runs against the pinned SDK versions in test/integration/sdk-versions.mjs.
+  # sdk-latest.yaml checks the latest ^3 and ^4 on a schedule.
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: fastly/compute-actions/setup@v14
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm ci
+      - run: npm run test:integration
