@@ -124,7 +124,9 @@ Default bindings which can be used when no user-defined bindings are present. Al
 
 The core adapter function that connects Hono to the Fastly Compute `FetchEvent`. The `fire` function is a higher-level utility that uses `handle` internally.
 
-- **`app`**: The Hono application instance.
+- **`app`**: The Hono application instance. If `bindingsDefs` is not empty, the
+   app's `Bindings` must be `BindingsWithClientInfo<typeof bindingsDefs>`. If it
+   is empty, the app does not have to declare `Bindings`.
 - **`bindingsDefs`**: The environment bindings definition.
 - **`options`**: An optional object with a `fetch` property.
 

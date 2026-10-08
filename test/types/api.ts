@@ -105,6 +105,13 @@ handle(new Hono<{ Bindings: B }>(), { kv: 'KVStore' });
 const defs = { kv: 'KVStore' } satisfies BindingsDefs;
 handle(new Hono<{ Bindings: BindingsWithClientInfo<typeof defs> }>(), defs);
 
+// With no bindings defs, an app that declares no Bindings is accepted (as with fire)
+handle(new Hono(), {});
+handle(new Hono<{ Variables: { user: string } }>(), {});
+handle(new Hono<{ Bindings: Bindings }>(), {});
+// @ts-expect-error -- with bindings defs, the app must declare the Bindings
+handle(new Hono(), { kv: 'KVStore' });
+
 // --- context typing inside handlers
 
 new Hono<{ Bindings: B }>().get('/', (c) => {
