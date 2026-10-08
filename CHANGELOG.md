@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [0.4.0] - 2026-10-08
+
 ### Updated
 
 - Support `@fastly/js-compute` v4. The peer dependency is now `^3.33.0 || ^4.0.0`.
+- `@fastly/js-compute` is no longer a direct dependency; it's only a peer dependency
+- Update `@fastly/compute-js-context` to `^0.6.0`
 
 ### Fixed
 
@@ -98,7 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release
 
-[unreleased]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.10...HEAD
+[unreleased]: https://github.com/fastly/hono-fastly-compute/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.10...v0.4.0
 [0.3.10]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.9...v0.3.10
 [0.3.9]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.8...v0.3.9
 [0.3.8]: https://github.com/fastly/hono-fastly-compute/compare/v0.3.7...v0.3.8
