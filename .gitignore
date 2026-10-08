@@ -8,3 +8,6 @@ coverage/
 # IDE files
 .idea/
 *.iml
+
+# Integration test scratch
+test/integration/.work/

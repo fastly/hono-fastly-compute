@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Updated
+
+- Support `@fastly/js-compute` v4. The peer dependency is now `^3.33.0 || ^4.0.0`.
+
+### Fixed
+
+- README example used a Config Store name that isn't valid in the JS SDK (`my-config` → `my_config`)
+
+### Added
+
+- Unit, type, and integration tests (integration tests run in Viceroy against multiple `@fastly/js-compute` versions)
+
 ## [0.3.10] - 2026-02-13
 
 ### Updated

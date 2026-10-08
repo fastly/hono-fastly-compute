@@ -1,0 +1,29 @@
+# Local-only manifest for the integration test app.
+# The origin backend's port placeholder is replaced by the test runner.
+
+manifest_version = 3
+name = "hono-fastly-compute-integration-test"
+language = "javascript"
+
+[local_server]
+
+  [local_server.backends.origin]
+  url = "http://127.0.0.1:__ORIGIN_PORT__"
+
+  [local_server.kv_stores]
+    [[local_server.kv_stores.assets]]
+    key = "hello"
+    data = "world"
+
+  [local_server.config_stores.my_config]
+  format = "inline-toml"
+    [local_server.config_stores.my_config.contents]
+    greeting = "hi"
+
+  [local_server.secret_stores]
+    [[local_server.secret_stores.my_secrets]]
+    key = "token"
+    data = "dummy-fixture-value"
+
+  [local_server.acls]
+  my_acl = "fixtures/acl.json"

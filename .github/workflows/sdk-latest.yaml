@@ -1,0 +1,29 @@
+name: Latest SDK check
+# Runs the integration tests against the latest @fastly/js-compute 3.x and 4.x,
+# to catch breakage from new SDK releases without failing regular CI.
+# When this passes on a new release, bump the pinned versions in
+# test/integration/sdk-versions.mjs.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: fastly/compute-actions/setup@v14
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm ci
+      - run: npm run test:integration
+        env:
+          SDK_VERSIONS: '^3,^4'

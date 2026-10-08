@@ -23,18 +23,24 @@
   "scripts": {
     "prepack": "npm run build",
     "build": "tsc -p tsconfig.build.json",
-    "clean": "rm -rf build"
+    "clean": "rm -rf build test/integration/.work",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p test/tsconfig.json",
+    "test": "npm run typecheck && npm run test:unit",
+    "test:unit": "node --import ./test/unit/hooks.ts --test \"test/unit/**/*.test.ts\"",
+    "test:coverage": "node --import ./test/unit/hooks.ts --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/unit/**/*.test.ts\"",
+    "test:integration": "npm run clean && npm run build && node test/integration/build-apps.mjs && node --test test/integration/integration.test.ts"
   },
   "dependencies": {
-    "@fastly/compute-js-context": "^0.5.1",
-    "@fastly/js-compute": "^3.0.0"
+    "@fastly/compute-js-context": "^0.6.0"
   },
   "devDependencies": {
-    "hono": "^4.9.5",
-    "typescript": "^5.4.5"
+    "@fastly/js-compute": "^4.0.0",
+    "@types/node": "^24.19.1",
+    "hono": "^4.13.7",
+    "typescript": "^7.0.2"
   },
   "peerDependencies": {
-    "@fastly/js-compute": "^3.0.0",
+    "@fastly/js-compute": "^3.33.0 || ^4.0.0",
     "hono": "^4.5.0"
   },
   "files": [
