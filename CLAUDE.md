@@ -10,6 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm run build` — compile `src/` to `build/` via `tsc -p tsconfig.build.json` (also runs on `prepack`)
 - `npm run clean` — remove `build/` and `test/integration/.work/`
+- `npm run clean:build` — remove only `build/`. `prepack` runs this (not `clean`), so that a packed package never contains stale files in `build/`. It must not remove `.work/`: `build-apps.mjs` runs `npm pack` (which runs `prepack`) with `.work/` as the destination.
 - `npm test` — `typecheck` + unit tests (fast; no Fastly tooling needed)
 - `npm run typecheck` — type-checks `src/` with the root `tsconfig.json` (Compute types only, no Node types, so Node-only APIs in `src/` fail), then `tsc -p test/tsconfig.json` for all test code and the compile-time assertions in `test/types/api.ts` (`@ts-expect-error` lines are assertions that something must *not* compile)
 - `npm run test:unit` — `node:test` unit tests in `test/unit/`
