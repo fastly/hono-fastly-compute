@@ -48,6 +48,15 @@ describe('handle()', () => {
     assert.equal(await res.text(), 'hi');
   });
 
+  it('serves an app that declares no Bindings when there are no bindings defs', async () => {
+    const app = new Hono();
+    // c.env is `unknown` for an app that declares no Bindings
+    app.get('/', (c) => c.text((c.env as BindingsWithClientInfo<{}>).clientInfo.address));
+
+    const res = await respond(handle(app, {}));
+    assert.equal(await res.text(), '192.0.2.1');
+  });
+
   it('passes the request (method, URL, headers, body) to the app', async () => {
     const app = newApp();
     app.post('/echo/:id', async (c) => c.json({

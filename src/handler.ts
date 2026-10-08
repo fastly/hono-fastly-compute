@@ -22,6 +22,17 @@ export type HandleOptions = {
 };
 
 type HandleFn = {
+  // An app that declares no Bindings, when there are no user bindings
+  // (as with `fire`)
+  <
+    D extends BindingsDefs,
+    V extends { Variables?: object },
+    S extends Schema,
+    BasePath extends string
+  >(
+    app: HonoBase<(keyof D extends never ? {} : never) & V, S, BasePath>,
+    envBindingsDefs: D,
+    opts?: HandleOptions): Handler;
   <
     D extends BindingsDefs,
     V extends { Variables?: object },
