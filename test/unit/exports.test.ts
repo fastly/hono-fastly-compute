@@ -23,8 +23,6 @@ describe('package entry point', () => {
   it('exports the public runtime API of ./compose', () => {
     assert.deepEqual(Object.keys(compose).sort(), [
       'CORE_PHASES',
-      'CORE_PHASE_NAMES',
-      'DEFAULT_HOST',
       'compose',
       'defineComposeHost',
       'definePlugin',

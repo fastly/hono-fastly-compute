@@ -9,7 +9,6 @@ import { Hono } from 'hono';
 
 import {
   CORE_PHASES,
-  DEFAULT_HOST,
   compose,
   defineComposeHost,
   definePlugin,
@@ -54,9 +53,10 @@ describe('definePlugin()', () => {
 
 describe('defineComposeHost()', () => {
   it('CORE_PHASES is the phases middleware and routes', () => {
-    assert.deepEqual(DEFAULT_HOST.phases, [ 'middleware', 'routes' ]);
-    assert.deepEqual(DEFAULT_HOST.steps, [ { kind: 'phase', name: 'middleware' }, { kind: 'phase', name: 'routes' } ]);
-    assert.deepEqual(DEFAULT_HOST.helpers, {});
+    const host = defineComposeHost({ steps: [ CORE_PHASES ] });
+    assert.deepEqual(host.phases, [ 'middleware', 'routes' ]);
+    assert.deepEqual(host.steps, [ { kind: 'phase', name: 'middleware' }, { kind: 'phase', name: 'routes' } ]);
+    assert.deepEqual(host.helpers, {});
   });
 
   it('keeps the order of the list, with phases and host steps', () => {

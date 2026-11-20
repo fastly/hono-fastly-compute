@@ -21,7 +21,7 @@ import type { BindingsWithClientInfo } from '../handler.js';
 export const CORE_PHASES: unique symbol = Symbol('CORE_PHASES');
 
 // The phases that CORE_PHASES stands for, in this order.
-export const CORE_PHASE_NAMES = [ 'middleware', 'routes' ] as const;
+const CORE_PHASE_NAMES = [ 'middleware', 'routes' ] as const;
 export type CorePhaseName = typeof CORE_PHASE_NAMES[number];
 
 // --- Hosts
@@ -115,7 +115,7 @@ export function defineComposeHost<const S extends readonly StepEntry<H>[], H = {
 }
 
 // The host of an app that does not give one: CORE_PHASES only, no helpers.
-export const DEFAULT_HOST = defineComposeHost({ steps: [ CORE_PHASES ] });
+const DEFAULT_HOST = defineComposeHost({ steps: [ CORE_PHASES ] });
 
 // --- The registered host, for the types of the plugins
 
