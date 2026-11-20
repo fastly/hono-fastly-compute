@@ -7,11 +7,25 @@ import type { Schema } from 'hono';
 import type { HonoBase } from 'hono/hono-base';
 import {
   type BindingsDefs,
+  type BindingsString,
   buildContextProxyOn,
-  type ContextProxy,
+  type ResourceInstance,
 } from '@fastly/compute-js-context';
 
-export type BindingsWithClientInfo<D extends BindingsDefs> = ContextProxy<D> & {
+/**
+ * The type on `c.env` of one binding: the resource, or `undefined` if the
+ * resource does not exist or is not linked to the service.
+ */
+export type BindingResource<R extends BindingsString> = ResourceInstance<R> | undefined;
+
+/**
+ * The user bindings on `c.env`, from the bindings definitions.
+ */
+export type BindingsResources<D extends BindingsDefs> = keyof D extends never ?
+  Record<string, never> :
+  { [K in keyof D]: BindingResource<D[K]> };
+
+export type BindingsWithClientInfo<D extends BindingsDefs> = BindingsResources<D> & {
   clientInfo: ClientInfo,
   serverInfo: ServerInfo,
 };

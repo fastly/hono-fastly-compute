@@ -40,10 +40,15 @@ const fire = buildFire({
 const app = new Hono<{ Bindings: typeof fire.Bindings }>();
 
 app.get('/', async (c) => {
-  // Access your bindings from the context
-  const value = await c.env.assets.get('some-key');
-  const setting = c.env.config.get('some-setting');
-  return c.json({ value, setting });
+  // Access your bindings from the context. A binding is undefined if its
+  // resource does not exist or is not linked to the service.
+  const { assets, config } = c.env;
+  if (assets == null || config == null) {
+    return c.text('Resource not linked', 500);
+  }
+  const entry = await assets.get('some-key');
+  const setting = config.get('some-setting');
+  return c.json({ value: await entry?.text(), setting });
 });
 
 fire(app);
@@ -106,6 +111,11 @@ cached. If a resource doesn't exist (or isn't linked to your service), its
 binding is `undefined`. Note that Config Store names can only contain letters,
 digits, underscores, and spaces; a name such as `my-config` can't be opened, so
 its binding is always `undefined`.
+
+The type of each binding includes `undefined`, for example `KVStore | undefined`,
+so TypeScript makes you check a binding before you use it. The type of one
+binding is `BindingResource<'KVStore:my-kv-store'>`, and the type of all user
+bindings is `BindingsResources<typeof bindingsDefs>`.
 
 The returned `fire` function has two purposes:
 1. When called with a Hono app instance (`fire(app)`), it registers the app to handle fetch events.

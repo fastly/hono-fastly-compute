@@ -33,13 +33,13 @@ const typedFire = buildFire({
 });
 type B = typeof typedFire.Bindings;
 
-assertType<Equals<B['acl'], Acl>>();
-assertType<Equals<B['backend'], Backend>>();
-assertType<Equals<B['config'], ConfigStore>>();
-assertType<Equals<B['env'], string>>();
-assertType<Equals<B['kv'], KVStore>>();
-assertType<Equals<B['logger'], Logger>>();
-assertType<Equals<B['secrets'], SecretStore>>();
+assertType<Equals<B['acl'], Acl | undefined>>();
+assertType<Equals<B['backend'], Backend | undefined>>();
+assertType<Equals<B['config'], ConfigStore | undefined>>();
+assertType<Equals<B['env'], string | undefined>>();
+assertType<Equals<B['kv'], KVStore | undefined>>();
+assertType<Equals<B['logger'], Logger | undefined>>();
+assertType<Equals<B['secrets'], SecretStore | undefined>>();
 assertType<Equals<B['clientInfo'], ClientInfo>>();
 assertType<Equals<B['serverInfo'], ServerInfo>>();
 assertType<Equals<Bindings['clientInfo'], ClientInfo>>();

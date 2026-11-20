@@ -23,7 +23,9 @@ import {
   handle,
   logFastlyServiceVersion,
   type Bindings,
+  type BindingResource,
   type BindingsDefs,
+  type BindingsResources,
   type BindingsWithClientInfo,
   type HandleOptions,
   type ResourceType,
@@ -48,15 +50,18 @@ const typedFire = buildFire({
 });
 type B = typeof typedFire.Bindings;
 
-assertType<Equals<B['acl'], Acl>>();
-assertType<Equals<B['backend'], Backend>>();
-assertType<Equals<B['config'], ConfigStore>>();
-assertType<Equals<B['env'], string>>();
-assertType<Equals<B['kv'], KVStore>>();
-assertType<Equals<B['logger'], Logger>>();
-assertType<Equals<B['secrets'], SecretStore>>();
-assertType<Equals<B['renamedKv'], KVStore>>();
-assertType<Equals<B['renamedEnv'], string>>();
+// A binding is undefined if the resource does not exist or is not linked.
+assertType<Equals<B['acl'], Acl | undefined>>();
+assertType<Equals<B['backend'], Backend | undefined>>();
+assertType<Equals<B['config'], ConfigStore | undefined>>();
+assertType<Equals<B['env'], string | undefined>>();
+assertType<Equals<B['kv'], KVStore | undefined>>();
+assertType<Equals<B['logger'], Logger | undefined>>();
+assertType<Equals<B['secrets'], SecretStore | undefined>>();
+assertType<Equals<B['renamedKv'], KVStore | undefined>>();
+assertType<Equals<B['renamedEnv'], string | undefined>>();
+assertType<Equals<BindingResource<'KVStore:my-kv-store'>, KVStore | undefined>>();
+assertType<Equals<BindingsResources<{}>, Record<string, never>>>();
 assertType<Equals<B['clientInfo'], ClientInfo>>();
 assertType<Equals<B['serverInfo'], ServerInfo>>();
 assertType<Equals<B, BindingsWithClientInfo<typeof typedFire._defs>>>();
@@ -115,7 +120,7 @@ handle(new Hono(), { kv: 'KVStore' });
 // --- context typing inside handlers
 
 new Hono<{ Bindings: B }>().get('/', (c) => {
-  assertType<Equals<typeof c.env.kv, KVStore>>();
+  assertType<Equals<typeof c.env.kv, KVStore | undefined>>();
   // FetchEventLike augmentation exposes Fastly's client/server info on c.event
   assertType<Equals<typeof c.event.client, ClientInfo>>();
   assertType<Equals<typeof c.event.server, ServerInfo>>();
