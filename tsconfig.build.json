@@ -6,5 +6,10 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    // Node only: compiled with tsconfig.node.json
+    "src/compose/build"
   ]
 }

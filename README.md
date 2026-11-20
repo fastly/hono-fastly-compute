@@ -213,14 +213,14 @@ export default definePlugin({ bindings: { config: 'ConfigStore:site_config' } },
 });
 ```
 
+The plugins are the files of a folder, by default `hono-compose/`. Before each build, the app bundles them into one file, `src/hono-compose.generated.js` (see [The folder of plugins](#the-folder-of-plugins)):
+
 ```typescript
-// the app
+// the app (src/index.ts)
 import { Hono } from 'hono';
 import { buildFire } from '@fastly/hono-fastly-compute';
-import { compose, mergeBindings, type PluginEntry } from '@fastly/hono-fastly-compute/compose';
-import hello from './plugins/hello.js';
-
-const plugins: PluginEntry[] = [ { name: 'hello', file: 'plugins/hello.ts', plugin: hello } ];
+import { compose, mergeBindings } from '@fastly/hono-fastly-compute/compose';
+import { plugins } from './hono-compose.generated.js';
 
 // The bindings of the app and of the plugins.
 const fire = buildFire(mergeBindings({}, plugins));
@@ -273,6 +273,48 @@ Runs the list of steps of the host on `app`: for each phase, the function of tha
 - **`options.pluginOptions`**: The options of each plugin, by the name of the plugin.
 
 It throws if a module does not default-export `definePlugin(…)`, or if a plugin has a phase that the host does not have. The message names the file.
+
+### The folder of plugins
+
+`@fastly/hono-fastly-compute/compose/build` runs in Node, before the build of the app. It bundles the plugins of a folder into one file of the app (the manifest), which exports `plugins` for `compose()`. Never import it in the code of the app.
+
+The plugins are the files directly in the folder with the extension `.js`, `.mjs`, `.ts`, or `.mts`, in file-name order. The name of a plugin is its file name without an order prefix (`10-`) and without the extension: `10-auth.ts` is the plugin `auth`. These files are not plugins: files that start with `_` or `.`, `.d.ts` files, and the files in subfolders (for example `lib/`), so a plugin can import its helpers from them. `index` is a reserved name: a file `index.ts` (or `.js`, `.mjs`, `.mts`) stops the build.
+
+The packages in the `dependencies` of the app's `package.json`, this package, and the `fastly:*` modules stay imports in the bundle, so that the app has one copy of each. The folder can have its own `package.json` for its other packages. If it asks for a version of a package that the app provides, and the app has another version, the build shows a warning and uses the app's version.
+
+A prebuild script of the app, for example `scripts/prebuild.mjs` with `"prebuild": "node scripts/prebuild.mjs"` in `package.json`:
+
+```javascript
+import * as esbuild from 'esbuild';
+import { bundlePlugins } from '@fastly/hono-fastly-compute/compose/build';
+
+await bundlePlugins({ appDir: process.cwd(), esbuild });
+```
+
+The app passes its own `esbuild` (a dev dependency of the app), so that this package does not depend on it. Add `src/hono-compose.generated.js` and `src/hono-compose.generated.d.ts` to `.gitignore`.
+
+#### `bundlePlugins(options)`
+
+Bundles the plugins into the manifest, and writes its types (the same file name with `.d.ts`). Without the folder, or without plugins, it writes a manifest with no plugins. It writes a file only if its content changes. Returns `true` if it wrote the manifest.
+
+- **`appDir`**: The directory of the app (the directory of its `package.json`).
+- **`esbuild`**: The `esbuild` module of the app.
+- **`dir`**: The folder of the plugins, relative to `appDir`. Default: `./hono-compose`.
+- **`manifest`**: The manifest, relative to `appDir`. Default: `src/hono-compose.generated.js`.
+- **`pluginOptions`**: The options that the app gives to `compose()`. The build warns about a name that no plugin has. **`pluginOptionsSource`** is the name of these options in that warning.
+- **`hint`**: A sentence at the end of each warning about versions, for example a command that updates the folder's `package.json`.
+
+#### `watchPlugins(options)`
+
+Bundles the plugins, then watches the folder and bundles them again after each change, for development (for example next to `fastly compute serve --watch`, which then sees the new manifest and builds the app again). It also finds a folder that is made later. A failed bundle shows the error and keeps the manifest. Takes the options of `bundlePlugins()`, and returns an object with `close()`.
+
+#### Other functions
+
+- **`writePluginsStub({ appDir, manifest })`**: Writes a manifest with no plugins, and its types, so that the app can import it before the first build.
+- **`listPlugins(dir)`**: The plugins of a folder (`{ name, file }[]`).
+- **`pluginsDir({ appDir, dir })`**: The folder of the plugins, as an absolute path.
+- **`pluginsExternals(appDir)`**: The packages that stay imports in the bundle.
+- **`checkProvidedVersions(appDir, dir, { hint })`**: The warnings about versions.
 
 ### `mergeBindings(appBindings, plugins, options)`
 

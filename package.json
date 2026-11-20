@@ -21,15 +21,19 @@
     "./compose": {
       "types": "./build/compose/index.d.ts",
       "import": "./build/compose/index.js"
+    },
+    "./compose/build": {
+      "types": "./build/compose/build/index.d.ts",
+      "import": "./build/compose/build/index.js"
     }
   },
   "types": "./build/index.d.ts",
   "scripts": {
     "prepack": "npm run clean:build && npm run build",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.node.json",
     "clean": "npm run clean:build && rm -rf test/integration/.work",
     "clean:build": "rm -rf build",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p test/tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && tsc -p test/tsconfig.json",
     "test": "npm run typecheck && npm run test:unit",
     "test:unit": "node --import ./test/unit/hooks.ts --test \"test/unit/**/*.test.ts\"",
     "test:coverage": "node --import ./test/unit/hooks.ts --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/unit/**/*.test.ts\"",
@@ -41,6 +45,7 @@
   "devDependencies": {
     "@fastly/js-compute": "^4.0.0",
     "@types/node": "^24.19.1",
+    "esbuild": "^0.28.2",
     "hono": "^4.13.7",
     "typescript": "^7.0.2"
   },
