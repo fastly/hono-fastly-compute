@@ -28,6 +28,15 @@ const fire = buildFire({
 
 const app = new Hono<{ Bindings: typeof fire.Bindings }>();
 
+// The resource of a binding. Each route below needs its resource, so a missing
+// resource is an error in the setup of the test.
+function required<T>(resource: T | undefined, name: string): T {
+  if (resource === undefined) {
+    throw new Error(`The binding '${name}' has no resource.`);
+  }
+  return resource;
+}
+
 app.get('/', (c) => c.text('ok'));
 
 app.get('/client-info', (c) => {
@@ -40,16 +49,16 @@ app.get('/client-info', (c) => {
 app.get('/conninfo', (c) => c.json(getConnInfo(c)));
 
 app.get('/kv', async (c) => {
-  const entry = await c.env.assets.get('hello');
+  const entry = await required(c.env.assets, 'assets').get('hello');
   return c.json({ value: await entry?.text() });
 });
 
 app.get('/config', (c) => {
-  return c.json({ value: c.env.config.get('greeting') });
+  return c.json({ value: required(c.env.config, 'config').get('greeting') });
 });
 
 app.get('/secret', async (c) => {
-  const secret = await c.env.secrets.get('token');
+  const secret = await required(c.env.secrets, 'secrets').get('token');
   // Dummy fixture value from fastly.toml, not a real secret
   return c.json({ value: secret?.plaintext() });
 });
@@ -66,18 +75,19 @@ app.get('/missing', (c) => {
 });
 
 app.get('/acl', async (c) => {
-  const blocked = await c.env.acl.lookup('192.0.2.1');
-  const unlisted = await c.env.acl.lookup('198.51.100.1');
+  const acl = required(c.env.acl, 'acl');
+  const blocked = await acl.lookup('192.0.2.1');
+  const unlisted = await acl.lookup('198.51.100.1');
   return c.json({ blocked: blocked?.action ?? null, unlisted: unlisted?.action ?? null });
 });
 
 app.get('/logger', (c) => {
-  c.env.logger.log('integration test log line');
+  required(c.env.logger, 'logger').log('integration test log line');
   return c.json({ logged: true });
 });
 
 app.get('/backend', async (c) => {
-  const res = await fetch('http://origin/via-backend', { backend: c.env.origin });
+  const res = await fetch('http://origin/via-backend', { backend: required(c.env.origin, 'origin') });
   return c.json({ status: res.status, body: await res.text() });
 });
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Changed
+
+- **Breaking (types only):** each user binding on `c.env` now has the type `<Resource> | undefined`, for example `KVStore | undefined`. At runtime, a binding was already `undefined` when its resource does not exist or is not linked to the service. Code that uses a binding must now check it, for example `c.env.assets?.get(...)`, or `if (c.env.assets == null) { ... }`.
+
+### Added
+
+- The types `BindingResource<R>` (the type on `c.env` of one binding) and `BindingsResources<D>` (the user bindings on `c.env`).
+
 ## [0.4.0] - 2026-10-08
 
 ### Updated
