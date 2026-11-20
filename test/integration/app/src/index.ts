@@ -14,8 +14,10 @@ import {
   getConnInfo,
   logFastlyServiceVersion,
 } from '@fastly/hono-fastly-compute';
+import { mergeBindings } from '@fastly/hono-fastly-compute/compose';
+import { composeApp, plugins } from './compose/index.js';
 
-const fire = buildFire({
+const appBindings = {
   assets: 'KVStore',
   config: 'ConfigStore:my_config',
   secrets: 'SecretStore:my_secrets',
@@ -24,7 +26,11 @@ const fire = buildFire({
   missing: 'KVStore:not-provisioned',
   acl: 'Acl:my_acl',
   logger: 'Logger:my_logger',
-});
+} as const;
+
+// The bindings of the app and of the Compose plugins. The type has only the
+// bindings of the app: each plugin types its own bindings.
+const fire = buildFire(mergeBindings(appBindings, plugins) as typeof appBindings);
 
 const app = new Hono<{ Bindings: typeof fire.Bindings }>();
 
@@ -108,6 +114,9 @@ app.get('/event', (c) => {
 app.post('/echo', async (c) => c.text(await c.req.text()));
 
 app.get('/log', logFastlyServiceVersion(), (c) => c.text('logged'));
+
+// The Compose app (see ./compose/).
+app.route('/compose', composeApp);
 
 // Unmatched routes fall through to the origin backend.
 fire(app, {

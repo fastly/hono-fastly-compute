@@ -7,6 +7,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import * as pkg from '../../src/index.js';
+import * as compose from '../../src/compose/index.js';
 
 describe('package entry point', () => {
   it('exports the public runtime API', () => {
@@ -16,6 +17,18 @@ describe('package entry point', () => {
       'getConnInfo',
       'handle',
       'logFastlyServiceVersion',
+    ]);
+  });
+
+  it('exports the public runtime API of ./compose', () => {
+    assert.deepEqual(Object.keys(compose).sort(), [
+      'CORE_PHASES',
+      'CORE_PHASE_NAMES',
+      'DEFAULT_HOST',
+      'compose',
+      'defineComposeHost',
+      'definePlugin',
+      'mergeBindings',
     ]);
   });
 });
