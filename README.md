@@ -274,6 +274,16 @@ Runs the list of steps of the host on `app`: for each phase, the function of tha
 
 It throws if a module does not default-export `definePlugin(…)`, or if a plugin has a phase that the host does not have. The message names the file.
 
+### Examples
+
+[`examples/compose/`](examples/compose/) has a base app, and examples of plugins to copy into it:
+
+- [`app/`](examples/compose/app/): a Hono app with Compose, the folder `hono-compose/`, and its prebuild script. Copy it to start an app.
+- [`grip/`](examples/compose/grip/): realtime streams with Fastly Fanout (GRIP).
+- [`oauth/`](examples/compose/oauth/): a login with GitHub or Google.
+
+The examples are not part of the package. Each one is a starting point: after you copy it, the code is yours.
+
 ### The folder of plugins
 
 `@fastly/hono-fastly-compute/compose/build` runs in Node, before the build of the app. It bundles the plugins of a folder into one file of the app (the manifest), which exports `plugins` for `compose()`. Never import it in the code of the app.
@@ -360,6 +370,22 @@ SDK_VERSIONS="^3,^4" npm run test:integration
 ```
 
 After a build, the tests can be re-run without rebuilding with `node --test test/integration/integration.test.ts`.
+
+### Example tests
+
+`npm run test:examples` builds the library, and tests the examples of `examples/compose/` (`test/examples/examples.test.ts`). For each example, it copies the base app to `test/examples/.work/<name>/`, puts the example in `hono-compose/`, installs this package from `npm pack`, type-checks and builds the app, serves it with `fastly compute serve`, and sends it requests. It needs the Fastly CLI and network access. The GRIP test also needs [Pushpin](https://pushpin.org/) on your `PATH`. Without the Fastly CLI, the tests are skipped, and without Pushpin, the GRIP test is skipped.
+
+One test deploys both examples to a real service. **It replaces the active version of that service.** It runs only when these variables are set:
+
+| Variable | |
+| --- | --- |
+| `FASTLY_API_TOKEN` | A Fastly API token that can deploy to the service. |
+| `HFC_TEST_DEPLOY_SERVICE_ID` | The ID of the service. |
+| `HFC_TEST_DEPLOY_URL` | The URL of the service, for example `https://example.edgecompute.app`. |
+| `HFC_TEST_GRIP_PUBLISH_KEY` | The value of `PUBLISH_KEY` in the Secret Store of the service. |
+| `HFC_TEST_OAUTH_SESSION_KEY` | The value of `SESSION_KEY` in the Secret Store of the service. |
+
+The service must have Fanout turned on, a backend `self` to its own domain, and one Secret Store, linked with the names `grip` and `oauth`, with the entries `PUBLISH_KEY`, `FANOUT_API_TOKEN`, `SESSION_KEY`, and `GITHUB_CLIENT_SECRET` (any value).
 
 CI runs the tests on pull requests and pushes to `main`, and also runs the integration tests weekly against the latest `^3` and `^4`.
 

@@ -1,0 +1,20 @@
+{
+  "name": "hono-compose-app",
+  "private": true,
+  "type": "module",
+  "description": "A Hono app on Fastly Compute with Fastly Hono Compose. Copy it to start an app, or to try an example. See README.md.",
+  "scripts": {
+    "prebuild": "node scripts/prebuild.mjs",
+    "build": "js-compute src/index.ts bin/main.wasm",
+    "start": "fastly compute serve",
+    "deploy": "fastly compute publish"
+  },
+  "dependencies": {
+    "@fastly/hono-fastly-compute": "^0.5.0",
+    "@fastly/js-compute": "^4.3.0",
+    "hono": "^4.13.18"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
