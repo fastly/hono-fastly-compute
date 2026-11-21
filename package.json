@@ -17,6 +17,10 @@
     ".": {
       "types": "./build/index.d.ts",
       "import": "./build/index.js"
+    },
+    "./compose": {
+      "types": "./build/compose/index.d.ts",
+      "import": "./build/compose/index.js"
     }
   },
   "types": "./build/index.d.ts",

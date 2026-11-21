@@ -186,5 +186,42 @@ for (const version of SDK_VERSIONS) {
       assert.equal(await res.text(), 'logged');
       await waitFor(() => /FASTLY_SERVICE_VERSION \S+/.test(serveOutput), 5_000, 'log output');
     });
+
+    describe('Compose (/compose)', () => {
+      const text = async (path: string) => {
+        const res = await get(path);
+        return { status: res.status, body: await res.text(), out: res.headers.get('x-out') };
+      };
+
+      it('runs the middleware of the plugins in file-name order, and the code after next() in reverse order', async () => {
+        const res = await get('/compose/trace');
+        assert.deepEqual(await res.json(), { trace: [ 'a', 'b' ] });
+        assert.equal(res.headers.get('x-out'), 'b, a');
+      });
+
+      it('a route in the routes phase wins over a file', async () => {
+        assert.deepEqual(await text('/compose/shadowed'), { status: 200, body: 'route:shadowed', out: 'b, a' });
+      });
+
+      it('a file wins over a route in afterFilesRoutes', async () => {
+        assert.deepEqual(await text('/compose/files/hello'), { status: 200, body: 'file:hello', out: 'b, a' });
+      });
+
+      it('afterFilesRoutes answers when no file does', async () => {
+        assert.deepEqual(await text('/compose/old'), { status: 200, body: 'late:old', out: 'b, a' });
+      });
+
+      it('the fallback step answers when nothing else does', async () => {
+        assert.deepEqual(await text('/compose/nothing'), { status: 200, body: 'fallback', out: 'b, a' });
+      });
+
+      it('a plugin gets its options and the helpers of the host', async () => {
+        assert.deepEqual(await getJson('/compose/info'), { greeting: 'hello', helpers: 'integration-helpers' });
+      });
+
+      it('a plugin binding is on c.env (mergeBindings)', async () => {
+        assert.deepEqual(await getJson('/compose/plugin-config'), { value: 'hi' });
+      });
+    });
   });
 }

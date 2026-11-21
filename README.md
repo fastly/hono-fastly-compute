@@ -182,6 +182,102 @@ app.get('/', (c) => {
 fire(app);
 ```
 
+## Fastly Hono Compose
+
+**Fastly Hono Compose** (`@fastly/hono-fastly-compute/compose`) is a plugin system for a Hono app on Fastly Compute. Each **plugin** is a module that default-exports `definePlugin(…)`. A plugin adds its code to the app in **phases**. A **host** (for example a package that serves a static site) gives the list of steps of the app: the phases, and its own steps between them. `compose()` runs the list.
+
+Every app has two phases, in this order:
+
+| Phase | What a plugin adds there |
+|---|---|
+| `middleware` | Middleware that wraps each request. The code before `await next()` runs on the way in, in the order of the plugins. The code after it runs on the way out, in the reverse order. All middleware is added before any route, so each middleware wraps each route. |
+| `routes` | Routes. The first route that answers wins. |
+
+A host can add phases and steps. For example, a host that serves files has the list `CORE_PHASES`, `files`, `afterFilesRoutes`, `fallback`: the routes of the `routes` phase win over the files, and the routes of `afterFilesRoutes` answer only when no file does.
+
+```typescript
+// a plugin
+import { definePlugin } from '@fastly/hono-fastly-compute/compose';
+
+export default definePlugin({ bindings: { config: 'ConfigStore:site_config' } }, {
+  middleware: (app) => {
+    app.use('*', async (c, next) => {
+      const start = performance.now();
+      await next();
+      c.res.headers.set('Server-Timing', `app;dur=${performance.now() - start}`);
+    });
+  },
+  routes: (app) => {
+    app.get('/api/hello', (c) => c.json({ hello: c.env.config?.get('name') ?? 'world' }));
+  },
+});
+```
+
+```typescript
+// the app
+import { Hono } from 'hono';
+import { buildFire } from '@fastly/hono-fastly-compute';
+import { compose, mergeBindings, type PluginEntry } from '@fastly/hono-fastly-compute/compose';
+import hello from './plugins/hello.js';
+
+const plugins: PluginEntry[] = [ { name: 'hello', file: 'plugins/hello.ts', plugin: hello } ];
+
+// The bindings of the app and of the plugins.
+const fire = buildFire(mergeBindings({}, plugins));
+const app = new Hono<{ Bindings: typeof fire.Bindings }>();
+compose(app, plugins);
+fire(app);
+```
+
+### `definePlugin([options,] phases)`
+
+Makes a plugin. The default export of a plugin module.
+
+- **`options.bindings`**: The bindings that the plugin uses on `c.env`, in the format of `buildFire()`. In the plugin, `c.env` has the type of these bindings, with `| undefined`.
+- **`phases`**: A function, which is the `middleware` phase, or an object with a function for each phase that the plugin uses. Each function gets `(app, options, helpers)`: the app, the options of the plugin (see `compose()`), and the helpers of the host.
+
+The type parameter of `definePlugin<O>()` is the type of the options.
+
+### `defineComposeHost({ steps, helpers })`
+
+Makes a host. Call it at the top level of the app.
+
+- **`steps`**: The list of steps, in order. Each entry is one of:
+   - `CORE_PHASES`: the phases `middleware` and `routes`. The list must have it exactly once.
+   - A string: a phase of the host, where the plugins can add code.
+   - `[ name, fn ]`: a step of the host. `fn` gets `(app, helpers)`.
+
+   The names must all be different. A phase before `CORE_PHASES` runs before the middleware of all plugins, so a plugin must add only middleware to it.
+- **`helpers`**: The value that each phase function of a plugin and each host step gets as `helpers`.
+
+It throws if the list is not correct.
+
+To give the plugins the names of the phases and the type of the helpers, register the host:
+
+```typescript
+declare module '@fastly/hono-fastly-compute/compose' {
+  interface ComposeHostRegistry {
+    host: typeof host;
+  }
+}
+```
+
+Without a registered host, a plugin has the phases `middleware` and `routes`, and no helpers.
+
+### `compose(app, plugins, options)`
+
+Runs the list of steps of the host on `app`: for each phase, the function of that phase of each plugin, in the order of `plugins`; for each host step, its function. Call it at the top level of the app, so that an error stops the build.
+
+- **`plugins`**: The list of plugins (`PluginEntry[]`): for each plugin, its `name`, its `file` (for messages), and the `plugin` (the default export of its module).
+- **`options.host`**: The host. Default: `CORE_PHASES` only, with no helpers.
+- **`options.pluginOptions`**: The options of each plugin, by the name of the plugin.
+
+It throws if a module does not default-export `definePlugin(…)`, or if a plugin has a phase that the host does not have. The message names the file.
+
+### `mergeBindings(appBindings, plugins, options)`
+
+Merges the bindings of the app with the bindings of the plugins, for `buildFire()`. The same name with the same resource is allowed. One name with two different resources throws, with a message that names the sources. `options.appBindingsSource` is the name of the bindings of the app in that message.
+
 ## Development
 
 ```bash
