@@ -1,0 +1,15 @@
+{
+  "name": "hono-compose-example-grip",
+  "private": true,
+  "type": "module",
+  "description": "The GRIP example of Fastly Hono Compose (@fastly/hono-fastly-compute). See README.md. The peer dependencies are the packages that the app provides: they are here for the editor and tsc, and the build uses the copies of the app.",
+  "dependencies": {
+    "@fanoutio/grip": "^4.4.0",
+    "@fanoutio/serve-grip": "^4.3.0"
+  },
+  "peerDependencies": {
+    "@fastly/hono-fastly-compute": "^0.5.0",
+    "@fastly/js-compute": "^4.3.0",
+    "hono": "^4.13.18"
+  }
+}

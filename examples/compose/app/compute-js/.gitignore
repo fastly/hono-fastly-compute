@@ -1,0 +1,6 @@
+node_modules/
+bin/
+pkg/
+# Written by scripts/prebuild.mjs at each build
+src/hono-compose.generated.js
+src/hono-compose.generated.d.ts

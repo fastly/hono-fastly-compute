@@ -11,3 +11,4 @@ coverage/
 
 # Integration test scratch
 test/integration/.work/
+test/examples/.work/

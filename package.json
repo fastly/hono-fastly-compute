@@ -31,13 +31,14 @@
   "scripts": {
     "prepack": "npm run clean:build && npm run build",
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.node.json",
-    "clean": "npm run clean:build && rm -rf test/integration/.work",
+    "clean": "npm run clean:build && rm -rf test/integration/.work test/examples/.work",
     "clean:build": "rm -rf build",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && tsc -p test/tsconfig.json",
     "test": "npm run typecheck && npm run test:unit",
     "test:unit": "node --import ./test/unit/hooks.ts --test \"test/unit/**/*.test.ts\"",
     "test:coverage": "node --import ./test/unit/hooks.ts --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/unit/**/*.test.ts\"",
-    "test:integration": "npm run clean && npm run build && node test/integration/build-apps.mjs && node --test test/integration/integration.test.ts"
+    "test:integration": "npm run clean && npm run build && node test/integration/build-apps.mjs && node --test test/integration/integration.test.ts",
+    "test:examples": "npm run build && node --test --test-concurrency=1 test/examples/examples.test.ts"
   },
   "dependencies": {
     "@fastly/compute-js-context": "^0.6.0"

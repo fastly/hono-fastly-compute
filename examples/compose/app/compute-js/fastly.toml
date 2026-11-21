@@ -1,0 +1,10 @@
+# This file describes a Fastly Compute package. To learn more visit:
+# https://www.fastly.com/documentation/reference/compute/fastly-toml
+
+manifest_version = 3
+name = "hono-compose-app"
+description = "A Hono app on Fastly Compute with Fastly Hono Compose"
+language = "javascript"
+
+[scripts]
+build = "npm run build"

@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The types `BindingResource<R>` (the type on `c.env` of one binding) and `BindingsResources<D>` (the user bindings on `c.env`).
 - **Fastly Hono Compose** (`@fastly/hono-fastly-compute/compose`), a plugin system for a Hono app on Fastly Compute: `definePlugin()`, `defineComposeHost()`, `CORE_PHASES`, `compose()`, `mergeBindings()`, and the types of plugins and hosts.
+- Examples in `examples/compose/` (not in the package): a base app with Compose, and the plugins `grip` (realtime streams with Fastly Fanout) and `oauth` (a login with GitHub or Google). `npm run test:examples` tests them.
 - `@fastly/hono-fastly-compute/compose/build` (Node only): `bundlePlugins()` and `watchPlugins()` bundle the plugins of a folder (default `hono-compose/`) into one file of the app, which exports `plugins` for `compose()`.
 
 ## [0.4.0] - 2026-10-08
