@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "ESNext",
+    // The app is bundled (js-compute and the build of the plugins use esbuild).
+    "moduleResolution": "bundler",
+    // As esbuild of js-compute, so that a package gives its Fastly variant.
+    "customConditions": ["fastly"],
+    "lib": ["es2022"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "erasableSyntaxOnly": true,
+    "allowJs": true,
+    "types": ["@fastly/js-compute"]
+  },
+  "include": ["src"]
+}

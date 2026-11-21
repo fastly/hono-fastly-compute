@@ -1,10 +1,11 @@
 {
+  // For the editor and tsc. The build of the app bundles this folder with
+  // esbuild, so tsc only checks the types.
   "compilerOptions": {
     "target": "es2022",
     "module": "ESNext",
-    // The app is bundled (js-compute and the build of the plugins use esbuild).
     "moduleResolution": "bundler",
-    // As esbuild of js-compute, so that a package gives its Fastly variant.
+    // As the build, so that a package gives its Fastly variant.
     "customConditions": ["fastly"],
     "lib": ["es2022"],
     "strict": true,
@@ -12,8 +13,8 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "erasableSyntaxOnly": true,
-    "allowJs": true,
     "types": ["@fastly/js-compute"]
   },
-  "include": ["src", "hono-compose"]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
 }

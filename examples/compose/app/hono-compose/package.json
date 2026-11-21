@@ -1,0 +1,11 @@
+{
+  "name": "hono-compose-app-plugins",
+  "private": true,
+  "type": "module",
+  "description": "The plugins of the base app of Fastly Hono Compose. The peer dependencies are the packages that the app (../compute-js) provides: they are here for the editor and tsc, and the build uses the copies of the app.",
+  "peerDependencies": {
+    "@fastly/hono-fastly-compute": "^0.5.0",
+    "@fastly/js-compute": "^4.3.0",
+    "hono": "^4.13.18"
+  }
+}

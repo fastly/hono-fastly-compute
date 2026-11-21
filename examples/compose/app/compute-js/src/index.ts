@@ -3,8 +3,8 @@
 import { Hono } from 'hono';
 import { buildFire, logFastlyServiceVersion } from '@fastly/hono-fastly-compute';
 import { compose, mergeBindings } from '@fastly/hono-fastly-compute/compose';
-// The plugins of hono-compose/. scripts/prebuild.mjs writes this file before
-// each build.
+// The plugins of ../hono-compose/. scripts/prebuild.mjs writes this file
+// before each build.
 import { plugins } from './hono-compose.generated.js';
 import { pluginOptions } from './plugin-options.js';
 

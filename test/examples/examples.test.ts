@@ -4,9 +4,10 @@
  */
 
 // The examples of examples/compose/: puts each one into a copy of the base app
-// (examples/compose/app), as the README of an example shows, with this
-// package from `npm pack`. Then it type-checks the app, builds it, runs it with
-// `fastly compute serve`, and sends it requests. Needs the Fastly CLI and
+// (examples/compose/app: compute-js/ and hono-compose/), as the README of an
+// example shows, with this package from `npm pack`. Then it builds the app,
+// type-checks the app and the plugins, runs the app with `fastly compute
+// serve`, and sends it requests. Needs the Fastly CLI and
 // network access for `npm install`. The GRIP test also needs Pushpin on the
 // PATH. These tests need no credentials.
 //
@@ -92,65 +93,70 @@ type ExampleAppOptions = {
   fastlyToml?: string,
 };
 
-// Makes an app from the base app with the examples in hono-compose/, as the
-// README of an example shows:
+// Makes an app from the base app (compute-js/ and hono-compose/ next to it)
+// with the examples in hono-compose/, as the README of an example shows:
 // - one example: replaces hono-compose/ with the hono-compose/ folder of the
-//   example, and installs its packages;
-// - more than one: copies the files of each example (not package.json), and
-//   installs the packages of each example.
-// Then it type-checks the app, and builds it.
+//   example;
+// - more than one: copies the plugins of each example into hono-compose/, and
+//   adds the dependencies of each example to its package.json.
+// Then it installs the packages in both directories, builds the app, and
+// type-checks both. Returns the directory of the app (compute-js/).
 function makeExampleApp(caseName: string, names: string[], options: ExampleAppOptions): string {
-  const dir = path.resolve(WORK_DIR, caseName);
-  fs.rmSync(dir, { recursive: true, force: true });
-  fs.cpSync(path.resolve(EXAMPLES_DIR, 'app'), dir, {
+  const root = path.resolve(WORK_DIR, caseName);
+  fs.rmSync(root, { recursive: true, force: true });
+  fs.cpSync(path.resolve(EXAMPLES_DIR, 'app'), root, {
     recursive: true,
     filter: (src) => !src.split(path.sep).includes('node_modules'),
   });
-
-  const pluginsDir = path.resolve(dir, 'hono-compose');
+  const appDir = path.resolve(root, 'compute-js');
+  const pluginsDir = path.resolve(root, 'hono-compose');
   const exampleDir = (name: string) => path.resolve(EXAMPLES_DIR, name, 'hono-compose');
-  // --legacy-peer-deps: do not install the peer dependencies of the packages
-  // of an example (for example @fastly/js-compute): the app provides them.
-  const npmInstall = [ 'install', '--no-audit', '--no-fund', '--legacy-peer-deps' ];
-  fs.rmSync(pluginsDir, { recursive: true });
-  const packages: string[] = [];
+
+  const readJson = (file: string) => JSON.parse(fs.readFileSync(file, 'utf-8'));
+  const writeJson = (file: string, value: unknown) => fs.writeFileSync(file, JSON.stringify(value, null, 2));
+
   if (names.length === 1) {
+    fs.rmSync(pluginsDir, { recursive: true });
     fs.cpSync(exampleDir(names[0]!), pluginsDir, { recursive: true });
   } else {
-    fs.mkdirSync(pluginsDir);
+    fs.rmSync(path.resolve(pluginsDir, 'hello.ts'));
+    const pluginsPackageJson = readJson(path.resolve(pluginsDir, 'package.json'));
     for (const name of names) {
       for (const entry of fs.readdirSync(exampleDir(name))) {
-        if (entry !== 'package.json') {
+        if (![ 'package.json', 'tsconfig.json', '.gitignore' ].includes(entry)) {
           fs.cpSync(path.resolve(exampleDir(name), entry), path.resolve(pluginsDir, entry), { recursive: true });
         }
       }
-      const { dependencies } = JSON.parse(fs.readFileSync(path.resolve(exampleDir(name), 'package.json'), 'utf-8'));
-      packages.push(...Object.entries(dependencies as Record<string, string>).map(([ pkg, range ]) => `${pkg}@${range}`));
+      pluginsPackageJson.dependencies = { ...pluginsPackageJson.dependencies, ...readJson(path.resolve(exampleDir(name), 'package.json')).dependencies };
     }
+    writeJson(path.resolve(pluginsDir, 'package.json'), pluginsPackageJson);
   }
   fs.writeFileSync(path.resolve(pluginsDir, 'zz-test-pages.ts'), TEST_PAGES);
-  fs.writeFileSync(path.resolve(dir, 'src/plugin-options.js'), `export const pluginOptions = ${JSON.stringify(options.pluginOptions, null, 2)};\n`);
+  fs.writeFileSync(path.resolve(appDir, 'src/plugin-options.js'), `export const pluginOptions = ${JSON.stringify(options.pluginOptions, null, 2)};\n`);
   if (options.fastlyToml != null) {
-    fs.appendFileSync(path.resolve(dir, 'fastly.toml'), `\n${options.fastlyToml}`);
+    fs.appendFileSync(path.resolve(appDir, 'fastly.toml'), `\n${options.fastlyToml}`);
   }
 
-  // This package from `npm pack`, in place of the version on npm.
-  const packageJsonPath = path.resolve(dir, 'package.json');
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-  packageJson.dependencies['@fastly/hono-fastly-compute'] = `file:${packedPackage()}`;
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  // This package from `npm pack`, in place of the version on npm (0.5.0 is not
+  // on npm yet). In hono-compose/, it is a peer dependency, which npm installs
+  // from the registry. Thus the test moves it to devDependencies, with the
+  // tarball.
+  const appPackageJson = readJson(path.resolve(appDir, 'package.json'));
+  appPackageJson.dependencies['@fastly/hono-fastly-compute'] = `file:${packedPackage()}`;
+  writeJson(path.resolve(appDir, 'package.json'), appPackageJson);
+  const pluginsPackageJson = readJson(path.resolve(pluginsDir, 'package.json'));
+  delete pluginsPackageJson.peerDependencies['@fastly/hono-fastly-compute'];
+  pluginsPackageJson.devDependencies = { ...pluginsPackageJson.devDependencies, '@fastly/hono-fastly-compute': `file:${packedPackage()}` };
+  writeJson(path.resolve(pluginsDir, 'package.json'), pluginsPackageJson);
 
-  run('npm', [ 'install', '--no-audit', '--no-fund' ], dir);
-  if (names.length === 1) {
-    run('npm', npmInstall, pluginsDir);
-  } else {
-    fs.writeFileSync(path.resolve(pluginsDir, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
-    run('npm', [ ...npmInstall, ...packages ], pluginsDir);
-  }
+  run('npm', [ 'install', '--no-audit', '--no-fund' ], appDir);
+  run('npm', [ 'install', '--no-audit', '--no-fund' ], pluginsDir);
   // npm runs the prebuild script before the build.
-  run('npm', [ 'run', 'build' ], dir);
-  run(path.resolve(ROOT, 'node_modules/.bin/tsc'), [ '-p', '.' ], dir);
-  return dir;
+  run('npm', [ 'run', 'build' ], appDir);
+  const tsc = path.resolve(ROOT, 'node_modules/.bin/tsc');
+  run(tsc, [ '-p', '.' ], appDir);
+  run(tsc, [ '-p', '.' ], pluginsDir);
+  return appDir;
 }
 
 async function getFreePort(): Promise<number> {
