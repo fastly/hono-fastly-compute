@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 
 import * as pkg from '../../src/index.js';
 import * as compose from '../../src/compose/index.js';
+import * as composeBuild from '../../src/compose/build/index.js';
 
 describe('package entry point', () => {
   it('exports the public runtime API', () => {
@@ -27,6 +28,20 @@ describe('package entry point', () => {
       'defineComposeHost',
       'definePlugin',
       'mergeBindings',
+    ]);
+  });
+
+  it('exports the build API of ./compose/build', () => {
+    assert.deepEqual(Object.keys(composeBuild).sort(), [
+      'DEFAULT_PLUGINS_DIR',
+      'PLUGINS_MANIFEST',
+      'bundlePlugins',
+      'checkProvidedVersions',
+      'listPlugins',
+      'pluginsDir',
+      'pluginsExternals',
+      'watchPlugins',
+      'writePluginsStub',
     ]);
   });
 });

@@ -8,11 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- `npm run build` — compile `src/` to `build/` via `tsc -p tsconfig.build.json` (also runs on `prepack`)
+- `npm run build` — compile `src/` to `build/` via `tsc -p tsconfig.build.json` (Compute part) and `tsc -p tsconfig.node.json` (`src/compose/build`, Node part) (also runs on `prepack`)
 - `npm run clean` — remove `build/` and `test/integration/.work/`
 - `npm run clean:build` — remove only `build/`. `prepack` runs this (not `clean`), so that a packed package never contains stale files in `build/`. It must not remove `.work/`: `build-apps.mjs` runs `npm pack` (which runs `prepack`) with `.work/` as the destination.
 - `npm test` — `typecheck` + unit tests (fast; no Fastly tooling needed)
-- `npm run typecheck` — type-checks `src/` with the root `tsconfig.json` (Compute types only, no Node types, so Node-only APIs in `src/` fail), then `tsc -p test/tsconfig.json` for all test code and the compile-time assertions in `test/types/api.ts` (`@ts-expect-error` lines are assertions that something must *not* compile)
+- `npm run typecheck` — type-checks `src/` with the root `tsconfig.json` (Compute types only, no Node types, so Node-only APIs in `src/` fail; `src/compose/build` is excluded), `src/compose/build` with `tsconfig.node.json` (Node types only), then `tsc -p test/tsconfig.json` for all test code and the compile-time assertions in `test/types/api.ts` (`@ts-expect-error` lines are assertions that something must *not* compile)
 - `npm run test:unit` — `node:test` unit tests in `test/unit/`
 - Single test file: `node --import ./test/unit/hooks.ts --test test/unit/handler.test.ts`
 - Single test by name: `node --import ./test/unit/hooks.ts --test --test-name-pattern="falls through" "test/unit/**/*.test.ts"` (Node flags must come before the file arguments)
@@ -40,6 +40,7 @@ Request flow: `fire(app)` → `addEventListener('fetch', handle(...))` → per r
 - `src/conninfo.ts` — Hono `GetConnInfo` implementation reading `c.env.clientInfo`.
 - `src/utils.ts` — `logFastlyServiceVersion()` middleware; imports `fastly:env`, a Fastly runtime built-in module.
 - `src/compose/index.ts` — the export `./compose` (Fastly Hono Compose): `definePlugin()`, `defineComposeHost()` (a list of steps: `CORE_PHASES` = the phases `middleware` and `routes`, other strings = phases of the host, `[name, fn]` = host steps), `compose()` (runs the list), `mergeBindings()`. Imports only types, so the unit tests load it without fakes. The types of a plugin come from the host that the app registers in `ComposeHostRegistry` (declaration merging); `test/types/compose.ts` checks the types without a host, and `test/integration/app/src/compose/` with one.
+- `src/compose/build/index.ts` — the export `./compose/build` (Node only, compiled and checked with `tsconfig.node.json`; the other tsconfigs exclude it): `listPlugins()`, `bundlePlugins()` (esbuild, which the app passes in; the app's `dependencies`, this package, and `fastly:*` stay external), `watchPlugins()`, `writePluginsStub()`. It writes `src/hono-compose.generated.js` and its `.d.ts`. `index.*` in the folder is reserved. The integration app runs it from the packed package in `scripts/prebuild.mjs`, on the plugins in `test/integration/app/hono-compose/`.
 - `src/index.ts` — barrel export; re-exports types from `@fastly/compute-js-context` and augments `hono/types`' `FetchEventLike` with `client`/`server`.
 
 `ClientInfo`, `ServerInfo`, `FetchEvent`, and `fastly:*` modules are ambient types from `@fastly/js-compute` (configured via `types` in `tsconfig.json`). Source imports use `.js` extensions (NodeNext module resolution). `verbatimModuleSyntax` and `erasableSyntaxOnly` are on, because the unit tests run the sources with Node's type stripping: type-only imports must use `import type` / `{ type X }`, and enums, namespaces and parameter properties are not allowed. Supported SDK range: `@fastly/js-compute` `^3.33.0 || ^4.0.0` (peer dependency; 3.32.x doesn't load the `fastly:acl` types that `@fastly/compute-js-context` needs).

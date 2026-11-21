@@ -45,8 +45,9 @@ const packOutput = execFileSync('npm', ['pack', '--json', '--pack-destination', 
 const [packed] = JSON.parse(packOutput);
 const tarball = join(WORK_DIR, packed.filename);
 
-// The app uses the same hono version as this repo's devDependency
+// The app uses the same hono and esbuild versions as this repo's devDependencies
 const honoVersion = readJson(join(root, 'node_modules/hono/package.json')).version;
+const esbuildVersion = readJson(join(root, 'node_modules/esbuild/package.json')).version;
 
 for (const version of SDK_VERSIONS) {
   const dir = sdkWorkDir(version);
@@ -61,12 +62,17 @@ for (const version of SDK_VERSIONS) {
       '@fastly/js-compute': version,
       'hono': honoVersion,
     },
+    devDependencies: {
+      'esbuild': esbuildVersion,
+    },
   }, null, 2));
   run('npm', ['install', '--no-audit', '--no-fund'], dir);
 
   const installed = readJson(join(dir, 'node_modules/@fastly/js-compute/package.json')).version;
   console.log(`  installed @fastly/js-compute@${installed}`);
 
+  // Bundles the plugins of hono-compose/ with the installed package, as an app does before its build.
+  run('node', ['scripts/prebuild.mjs'], dir);
   run(join(root, 'node_modules/.bin/tsc'), ['-p', '.'], dir);
   run(join(dir, 'node_modules/.bin/js-compute'), ['src/index.ts', 'bin/main.wasm'], dir);
 }

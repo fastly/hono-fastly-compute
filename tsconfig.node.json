@@ -1,0 +1,18 @@
+{
+  // The Node-only part of the package (src/compose/build, the export
+  // ./compose/build): Node types, and no Compute types.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/compose/build/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

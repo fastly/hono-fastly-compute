@@ -2,7 +2,7 @@
 node_modules/
 
 # Build/test artifacts
-build/
+/build/
 coverage/
 
 # IDE files

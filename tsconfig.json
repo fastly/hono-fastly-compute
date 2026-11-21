@@ -20,6 +20,8 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    // Node only: checked and compiled with tsconfig.node.json
+    "src/compose/build"
   ]
 }
